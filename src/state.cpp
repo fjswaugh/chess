@@ -7,8 +7,8 @@
 int sum_pieces(const Mailbox& m)
 {
     int score = 0;
-    for (int i = 0; i < m.size; ++i) {
-        auto piece = to_piece(m.square(i));
+    for (Position p = 0; p < m.size; ++p) {
+        auto piece = to_piece(m.square(p));
 
         int piece_value;
         switch (piece) {
@@ -28,7 +28,7 @@ int sum_pieces(const Mailbox& m)
                 piece_value = 0; break;
         };
 
-        if (is_black(m.square(i))) {
+        if (is_black(m.square(p))) {
             piece_value *= -1;
         }
 

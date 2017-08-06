@@ -16,8 +16,7 @@ struct Mailbox {
 
     static Mailbox from_fen(const std::string&);
 
-    const Square& square(int i) const { return square_array[i]; }
-    const Square& square(Position p) const { return square_array[p.value()]; }
+    const Square& square(Position p) const { return square_array[static_cast<int>(p)]; }
 
     void apply(const Move&);
 
