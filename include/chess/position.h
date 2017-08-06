@@ -14,12 +14,10 @@ struct Position {
     Position(int col, int row)
         : value_{row * 10 + 20 + col + 1}
     {
-        // Position must be on the board
-        assert(col >= 0 && col <= 7 && row >= 0 && row <= 7);
+        assert(col >= 0 && col <= 7 && row >= 0 && row <= 7 && "Position not on board");
     }
     Position(int i) : value_{i} {
-        // Position must be valid
-        assert(i >= 0 && i < 120);
+        assert(i >= 0 && i < 120 && "Invalid position");
     }
 
     int col() const { return value_ % 10 - 1; }
