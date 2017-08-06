@@ -37,9 +37,12 @@ $(LIBDIR)$(PRODUCT): $(OBJFILES)
 	mkdir -p $(LIBDIR)
 	ar rcs $@ $^
 
-test: $(BINDIR)$(TEST_EXECUTABLE)
+test: $(BINDIR)$(TEST_EXECUTABLE) run_tests
 
-$(BINDIR)$(TEST_EXECUTABLE): $(TESTFILES)
+run_tests:
+	$(BINDIR)$(TEST_EXECUTABLE)
+
+$(BINDIR)$(TEST_EXECUTABLE): $(TESTFILES) $(LIBDIR)$(PRODUCT)
 	$(CXX) $(CXXFLAGS) $(INCFLAGS) $(TESTFILES) -o $(BINDIR)$(TEST_EXECUTABLE) -L$(LIBDIR) -lchess -lboost_unit_test_framework
 
 # Clean the project by removing all object files and executable
