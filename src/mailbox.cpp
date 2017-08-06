@@ -178,7 +178,7 @@ std::vector<Move> generate_moves(const Mailbox& m, Player player)
         add_pawn_take_move(dir * 11);
     };
 
-    for (Position i = 0; i < m.size; ++i) {
+    for (int i = 0; i < m.size; ++i) {
         const auto square = m.square(i);
 
         if (is_square_owned_by_player(square, player)) {
@@ -273,7 +273,7 @@ void Mailbox::apply(const Move& m)
 bool in_check(const Mailbox& m, Player p)
 {
     const Position king_position = [&] {
-        for (Position i = 0; i < m.size; ++i) {
+        for (int i = 0; i < m.size; ++i) {
             if (to_piece(m.square(i)) == Piece::king &&
                 is_square_owned_by_player(m.square(i), p)) {
                 return i;

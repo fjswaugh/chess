@@ -40,7 +40,7 @@ $(LIBDIR)$(PRODUCT): $(OBJFILES)
 test: $(BINDIR)$(TEST_EXECUTABLE)
 
 $(BINDIR)$(TEST_EXECUTABLE): $(TESTFILES)
-	$(CXX) $(CXXFLAGS) $(INCFLAGS) $(TESTFILES) -o $(BINDIR)$(TEST_EXECUTABLE) -L$(LIBDIR) -lchess
+	$(CXX) $(CXXFLAGS) $(INCFLAGS) $(TESTFILES) -o $(BINDIR)$(TEST_EXECUTABLE) -L$(LIBDIR) -lchess -lboost_unit_test_framework
 
 # Clean the project by removing all object files and executable
 clean:
