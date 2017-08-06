@@ -6,8 +6,6 @@
 #include <sstream>
 #include <stdexcept>
 
-#include <iostream>
-
 #include "chess/mailbox.h"
 #include "chess/player.h"
 #include "chess/move.h"

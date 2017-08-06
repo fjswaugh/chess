@@ -27,7 +27,9 @@ struct Position {
 
     friend bool operator==(Position, Position);
     friend bool operator<(Position, Position);
+    friend bool operator<(Position, int);
     friend bool operator<=(Position, Position);
+    friend bool operator<=(Position, int);
     friend Position operator+(Position, Position);
     friend Position operator-(Position, Position);
     friend Position operator+(Position, int);
@@ -61,6 +63,22 @@ inline bool operator>(Position a, Position b) {
 }
 
 inline bool operator>=(Position a, Position b) {
+    return !(a < b);
+}
+
+inline bool operator<(Position a, int b) {
+    return a.value_ < b;
+}
+
+inline bool operator<=(Position a, int b) {
+    return a.value_ <= b;
+}
+
+inline bool operator>(Position a, int b) {
+    return !(a <= b);
+}
+
+inline bool operator>=(Position a, int b) {
     return !(a < b);
 }
 

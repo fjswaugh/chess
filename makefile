@@ -3,6 +3,8 @@ SHELL := bash
 # Name of the final library, to be put in $(LIBDIR)
 PRODUCT := libchess.a
 
+TEST_EXECUTABLE := tests
+
 # For the final .a file
 LIBDIR  := lib/
 # For any executable files (possibly from tests)
@@ -16,13 +18,14 @@ OBJDIR  := obj/
 # For test code
 TESTDIR := test/
 
-CXX := em++
-LINKER := em++
+CXX := g++
+LINKER := g++
 INCFLAGS := -I include
 CXXFLAGS := -std=c++14 -Wall -Wextra -O3
 
 # GNU Make wildcard function generates list of .cpp files
 SRCFILES := $(wildcard $(SRCDIR)*.cpp)
+TESTFILES := $(wildcard $(TESTDIR)*.cpp)
 # GNU Make patsubst creates list of .o files from source files
 OBJFILES := $(patsubst $(SRCDIR)%.cpp,$(OBJDIR)%.o,$(SRCFILES))
 # Here, the same thing is done to get a list of dependency files
@@ -34,9 +37,16 @@ $(LIBDIR)$(PRODUCT): $(OBJFILES)
 	mkdir -p $(LIBDIR)
 	ar rcs $@ $^
 
+test:
+	make $(BINDIR)$(TEST_EXECUTABLE)
+
+$(BINDIR)$(TEST_EXECUTABLE): $(TESTFILES)
+	$(CXX) $(CXXFLAGS) $(INCFLAGS) $(TESTFILES) -o $(BINDIR)$(TEST_EXECUTABLE) -L$(LIBDIR) -lchess
+	$(BINDIR)$(TEST_EXECUTABLE)
+
 # Clean the project by removing all object files and executable
 clean:
-	rm -f $(OBJDIR)*.o $(LIBDIR)$(PRODUCT)
+	rm -f $(OBJDIR)*.o $(LIBDIR)$(PRODUCT) $(BINDIR)*
 
 # Remove dependency files and rebuild all dependencies
 depends:
