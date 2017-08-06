@@ -18,8 +18,8 @@ OBJDIR  := obj/
 # For test code
 TESTDIR := test/
 
-CXX := g++
-LINKER := g++
+# CXX := em++ or g++ or clang++
+LINKER := $(CXX)
 INCFLAGS := -I include
 CXXFLAGS := -std=c++14 -Wall -Wextra -O3
 
@@ -37,12 +37,10 @@ $(LIBDIR)$(PRODUCT): $(OBJFILES)
 	mkdir -p $(LIBDIR)
 	ar rcs $@ $^
 
-test:
-	make $(BINDIR)$(TEST_EXECUTABLE)
+test: $(BINDIR)$(TEST_EXECUTABLE)
 
 $(BINDIR)$(TEST_EXECUTABLE): $(TESTFILES)
 	$(CXX) $(CXXFLAGS) $(INCFLAGS) $(TESTFILES) -o $(BINDIR)$(TEST_EXECUTABLE) -L$(LIBDIR) -lchess
-	$(BINDIR)$(TEST_EXECUTABLE)
 
 # Clean the project by removing all object files and executable
 clean:
