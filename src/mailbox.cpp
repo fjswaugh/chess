@@ -133,109 +133,107 @@ std::vector<Move> generate_moves(const Mailbox& m, Player player)
     const auto opponent = opponent_of(player);
     std::vector<Move> moves;
 
+    const auto add_linear_moves = [&](Position p, int offset) {
+        Position destination = p + offset;
+        while (is_empty(m.square(destination)) ||
+               is_square_owned_by_player(m.square(destination), opponent))
+        {
+            moves.push_back(Move{p, destination});
+            if (is_square_owned_by_player(m.square(destination), opponent)) break;
+            destination += offset;
+        }
+    };
+
+    const auto add_direct_move = [&](Position p, int offset) {
+        Position destination = p + offset;
+        if (is_empty(m.square(destination)) ||
+            is_square_owned_by_player(m.square(destination), opponent))
+        {
+            moves.push_back(Move{p, destination});
+        }
+    };
+
+    const auto add_pawn_moves = [&](Position p) {
+        // Forward direction for player
+        const int dir = (player == Player::white ? 1 : -1);
+
+        if (is_empty(m.square(p + dir * 10))) {
+            moves.push_back(Move{p, p + dir * 10});
+
+            // If the square in front is empty then consider moving two squares (but only if we're
+            // on the right row)
+            if (((player == Player::white && p < 39 && p > 30) ||
+                 (player == Player::black && p < 89 && p > 80)) &&
+                is_empty(m.square(p + dir * 20)))
+            {
+                moves.push_back(Move{p, p + dir * 20});
+            }
+        }
+
+        const auto add_pawn_take_move = [&](int offset) {
+            const Position destination = p + offset;
+            if (is_square_owned_by_player(m.square(destination), opponent)) {
+                moves.push_back(Move{p, destination});
+            }
+        };
+        add_pawn_take_move(dir * 9);
+        add_pawn_take_move(dir * 11);
+    };
+
     for (Position i = 0; i < m.size; ++i) {
         const auto square = m.square(i);
 
         if (is_square_owned_by_player(square, player)) {
-            const auto add_linear_moves = [&](int offset) {
-                Position destination = i + offset;
-                while (is_empty(m.square(destination)) ||
-                       is_square_owned_by_player(m.square(destination), opponent))
-                {
-                    moves.push_back(Move{i, destination});
-                    if (is_square_owned_by_player(m.square(destination), opponent)) break;
-                    destination += offset;
-                }
-            };
-            const auto add_direct_move = [&](int offset) {
-                Position destination = i + offset;
-                if (is_empty(m.square(destination)) ||
-                    is_square_owned_by_player(m.square(destination), opponent))
-                {
-                    moves.push_back(Move{i, destination});
-                }
-            };
-
             const auto piece = to_piece(square);
 
             switch (piece) {
             case Piece::empty:
                 break;
-            case Piece::pawn: {
-                // Forward direction for player
-                int dir = (player == Player::white ? 1 : -1);
-
-                if (is_empty(m.square(i + dir * 10))) {
-                    moves.push_back(Move{i, i + dir * 10});
-
-                    // If the square in front is empty then consider moving two squares (but only
-                    // if we're on the right row)
-                    if (((player == Player::white && i < 39 && i > 30) ||
-                         (player == Player::black && i < 89 && i > 80)) &&
-                        is_empty(m.square(i + dir * 20)))
-                    {
-                        moves.push_back(Move{i, i + dir * 20});
-                    }
-                }
-
-                auto add_pawn_take_move = [&](int offset) {
-                    const Position destination = i + offset;
-                    if (is_square_owned_by_player(m.square(destination), opponent)) {
-                        moves.push_back(Move{i, destination});
-                    }
-                };
-                add_pawn_take_move(dir * 9);
-                add_pawn_take_move(dir * 11);
+            case Piece::pawn:
+                add_pawn_moves(i);
                 break;
-            }
-            case Piece::rook: {
-                add_linear_moves(10);
-                add_linear_moves(1);
-                add_linear_moves(-1);
-                add_linear_moves(-10);
+            case Piece::rook:
+                add_linear_moves(i, 10);
+                add_linear_moves(i, 1);
+                add_linear_moves(i, -1);
+                add_linear_moves(i, -10);
                 break;
-            }
-            case Piece::knight: {
-                add_direct_move(21);
-                add_direct_move(12);
-                add_direct_move(-8);
-                add_direct_move(-19);
-                add_direct_move(-21);
-                add_direct_move(-12);
-                add_direct_move(8);
-                add_direct_move(19);
+            case Piece::knight:
+                add_direct_move(i, 21);
+                add_direct_move(i, 12);
+                add_direct_move(i, -8);
+                add_direct_move(i, -19);
+                add_direct_move(i, -21);
+                add_direct_move(i, -12);
+                add_direct_move(i, 8);
+                add_direct_move(i, 19);
                 break;
-            }
-            case Piece::bishop: {
-                add_linear_moves(11);
-                add_linear_moves(-9);
-                add_linear_moves(-11);
-                add_linear_moves(9);
+            case Piece::bishop:
+                add_linear_moves(i, 11);
+                add_linear_moves(i, -9);
+                add_linear_moves(i, -11);
+                add_linear_moves(i, 9);
                 break;
-            }
-            case Piece::queen: {
-                add_linear_moves(10);
-                add_linear_moves(1);
-                add_linear_moves(-1);
-                add_linear_moves(-10);
-                add_linear_moves(11);
-                add_linear_moves(-9);
-                add_linear_moves(-11);
-                add_linear_moves(9);
+            case Piece::queen:
+                add_linear_moves(i, 10);
+                add_linear_moves(i, 1);
+                add_linear_moves(i, -1);
+                add_linear_moves(i, -10);
+                add_linear_moves(i, 11);
+                add_linear_moves(i, -9);
+                add_linear_moves(i, -11);
+                add_linear_moves(i, 9);
                 break;
-            }
-            case Piece::king: {
-                add_direct_move(1);
-                add_direct_move(9);
-                add_direct_move(10);
-                add_direct_move(11);
-                add_direct_move(-1);
-                add_direct_move(-9);
-                add_direct_move(-10);
-                add_direct_move(-11);
-
+            case Piece::king:
+                add_direct_move(i, 1);
+                add_direct_move(i, 9);
+                add_direct_move(i, 10);
+                add_direct_move(i, 11);
+                add_direct_move(i, -1);
+                add_direct_move(i, -9);
+                add_direct_move(i, -10);
+                add_direct_move(i, -11);
                 break;
-            }
             }
         }
     }
