@@ -12,14 +12,6 @@ enum class Castle_rights : char {
     none
 };
 
-class Positive_integer {
-public:
-    Positive_integer(int i) : i_{i} { assert(i > 0); }
-    operator int() const { return i_; }
-private:
-    int i_;
-};
-
 struct State {
     static State from_fen(const std::string& fen)
     {
