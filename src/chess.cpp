@@ -45,7 +45,7 @@ bool is_legal_move(const Move& m, const State& s)
         std::remove_if(valid_moves.begin(), valid_moves.end(), [&state](const Move120& m) {
             auto new_state = state;
             new_state.apply(m);
-            return in_check(new_state.board, new_state.active_player);
+            return in_check(new_state.board, state.active_player);
         });
     return std::find(valid_moves.begin(), end, move) != end;
 }

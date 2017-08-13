@@ -80,3 +80,13 @@ BOOST_AUTO_TEST_CASE(speed)
               << " ms\n";
 }
 
+BOOST_AUTO_TEST_CASE(game)
+{
+    Chess::Game game;
+    const auto state = Chess::State::from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+    game = Chess::Game{state};
+    pretty_print(game.state());
+    game.undo();
+    pretty_print(game.state());
+}
+
