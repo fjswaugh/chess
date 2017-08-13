@@ -36,12 +36,12 @@ Move calculate_best_move(const State& s)
 
 bool is_legal_move(const Move& m, const State& s)
 {
-    auto valid_moves = generate_moves(s.board, s.active_player);
-    add_castling_moves(s.board, s.active_player, valid_moves);
+    auto moves = generate_moves(s.board, s.active_player);
+    add_castling_moves(s.board, s.active_player, moves);
     State120 state = s;
     Move120 move = m;
 
-    if (std::find(valid_moves.begin(), valid_moves.end(), move) == valid_moves.end()) {
+    if (std::find(moves.begin(), moves.end(), move) == moves.end()) {
         return false;
     }
 
