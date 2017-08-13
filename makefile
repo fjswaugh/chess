@@ -47,7 +47,7 @@ $(BINDIR)$(TEST_EXECUTABLE): $(TESTFILES) $(LIBDIR)$(PRODUCT)
 
 # Clean the project by removing all object files and executable
 clean:
-	rm -f $(OBJDIR)*.o $(LIBDIR)$(PRODUCT) $(BINDIR)*
+	rm -f $(OBJDIR)* $(LIBDIR)$(PRODUCT) $(BINDIR)*
 
 # Remove dependency files and rebuild all dependencies
 depends:

@@ -1,7 +1,9 @@
 #pragma once
 
 #include <cstdint>
-#include "player.h"
+#include "chess/misc.h"
+
+namespace Chess {
 
 using Underlying_square_t = std::uint8_t;
 
@@ -22,8 +24,8 @@ enum class Square : Underlying_square_t {
      * Bit 6: can castle flag
      * Bit 7: off board
      */
-    off_board         = 0b00000001,
     empty             = 0b00000000,
+    off_board         = 0b00000001,
     en_passant_target = 0b00000100,
 
     white_pawn    = 0b10001000,
@@ -209,4 +211,6 @@ inline Square to_square(char ch)
         return Square::empty;
     }
 }
+
+}  // namespace Chess
 

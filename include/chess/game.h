@@ -2,8 +2,9 @@
 
 #include <vector>
 
-#include "state.h"
-#include "move.h"
+#include "chess/state.h"
+
+namespace Chess {
 
 class Game {
 public:
@@ -25,4 +26,6 @@ public:
 private:
     std::vector<State> history_;
 };
+
+}  // namespace Chess
 

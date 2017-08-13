@@ -1,91 +1,73 @@
 #include "chess/state.h"
-#include "chess/move.h"
-#include "chess/mailbox.h"
-#include <random>
-#include <limits>
 
-int sum_pieces(const Mailbox& m)
+namespace Chess {
+
+State State::from_fen(const std::string& fen_str)
 {
-    int score = 0;
-    for (int i = 0; i < m.size; ++i) {
-        auto piece = to_piece(m.square(i));
-
-        int piece_value;
-        switch (piece) {
-            case Piece::rook:
-                piece_value = 5; break;
-            case Piece::queen:
-                piece_value = 10; break;
-            case Piece::bishop:
-                piece_value = 3; break;
-            case Piece::king:
-                piece_value = 100000000; break;
-            case Piece::knight:
-                piece_value = 3; break;
-            case Piece::pawn:
-                piece_value = 1; break;
-            default:
-                piece_value = 0; break;
-        };
-
-        if (is_black(m.square(i))) {
-            piece_value *= -1;
-        }
-
-        score += piece_value;
-    }
-
-    return score;
+    return State{Board::from_fen(fen_str)};
 }
 
-int minimax_evaluate(int depth, const State& s, bool maximise)
+std::string to_fen(const State& s)
 {
-    if (depth <= 0) return sum_pieces(s.mailbox);
-
-    auto moves = generate_moves(s.mailbox, s.active_player);
-
-    int best_score = (maximise ? std::numeric_limits<int>::min() :
-                                 std::numeric_limits<int>::max());
-
-    for (const auto move : moves) {
-        auto s_copy = s;
-        s_copy.apply(move);
-        auto score = minimax_evaluate(depth - 1, s_copy, !maximise);
-
-        if ((maximise  && score > best_score) ||
-            (!maximise && score < best_score))
-        {
-            best_score = score;
-        }
-    }
-    return best_score;
+    return to_fen(s.board);
 }
 
-Move calculate_best_move(const State& s)
-{
-    constexpr int depth = 4;
-    const bool maximise = s.active_player == Player::white;
+Board Board::from_fen(const std::string& fen_str) {
+    // Just use the first part of the fen_str, ignoring anything extra
 
-    auto moves = generate_moves(s.mailbox, s.active_player);
-    if (moves.empty()) throw std::runtime_error("Cannot find a legit move");
+    Board b;
 
-    int best_score = (maximise ? std::numeric_limits<int>::min()
-                               : std::numeric_limits<int>::max());
-    auto best_move = moves.front();
+    int row = 7;
+    int col = 0;
 
-    for (auto&& move : moves) {
-        auto s_copy = s;
-        s_copy.apply(move);
-        auto score = minimax_evaluate(depth - 1, s_copy, !maximise);
+    for (char ch : fen_str) {
+        if (ch == '/') continue;
 
-        if ((maximise && score > best_score) ||
-            (!maximise && score < best_score))
-        {
-            best_score = score;
-            best_move  = move;
+        if (ch > '0' && ch <= '9') {
+            col += (ch - '0');
+        } else {
+            b[col][row] = to_square(ch);
+            ++col;
         }
+
+        if (col > 7) {
+            col = 0;
+            --row;
+        }
+        if (row < 0) break;
     }
 
-    return best_move;
+    return b;
 }
+
+std::string to_fen(const Board& b)
+{
+    std::string result;
+    int count = 0;
+
+    auto push_back_count = [&result, &count] {
+        if (count > 0) {
+            result.push_back(count + '0');
+            count = 0;
+        }
+    };
+
+    for (int row = 7; row >= 0; --row) {
+        for (int col = 0; col < 8; ++col) {
+            if (is_empty(b[col][row])) {
+                ++count;
+            } else {
+                push_back_count();
+                result.push_back(to_char(b[col][row]));
+            }
+        }
+        push_back_count();
+        result.push_back('/');
+    }
+    result.pop_back();  // Pop back the last slash
+
+    return result;
+}
+
+}  // namespace Chess
 
