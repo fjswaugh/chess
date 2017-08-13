@@ -101,8 +101,6 @@ BOOST_AUTO_TEST_CASE(legal_move_checking)
     BOOST_CHECK(state.active_player == Chess::Player::white);
     BOOST_CHECK(Chess::is_legal_move(Chess::Move{"h5", "f7"}, state));
 
-    pretty_print(state);
-
     state = apply(Chess::Move{"a2", "a3"}, state);
     state = apply(Chess::Move{"b7", "b6"}, state);
     state = apply(Chess::Move{"b2", "b3"}, state);
@@ -111,7 +109,22 @@ BOOST_AUTO_TEST_CASE(legal_move_checking)
     state = apply(Chess::Move{"c8", "a6"}, state);
     BOOST_CHECK(state.active_player == Chess::Player::white);
     BOOST_CHECK(!Chess::is_legal_move(Chess::Move{"e1", "e2"}, state));
+}
 
+BOOST_AUTO_TEST_CASE(interesting_position)
+{
+    const auto initial_fen = "1r1k2r1/4R2p/5np1/6N1/5N1P/6P1/5PK1/4R3";
+    auto state = Chess::State::from_fen(initial_fen);
     pretty_print(state);
+    std::cout << "Evaluation: " << Chess::evaluate(state) << '\n';
+    std::cout << "It doesn't see the checkmate caused by this move: ";
+    const auto move = Chess::Move::from_string("g5-f7");
+    std::cout << to_string(move) << "\n\n";
+
+    state = Chess::apply(move, state);
+    pretty_print(state);
+    std::cout << "Evaluation: " << Chess::evaluate(state) << '\n';
+    std::cout << "Now the black king will be taken within four half moves, so it can see its "
+                 "inevitability\n\n";
 }
 
