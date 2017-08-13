@@ -217,7 +217,7 @@ bool in_check(const Board120& b, Player p)
             }
         }
         // No king???
-        assert(false && "No king found in mailbox");
+        assert(false && "No king found in 'in_check' function");
     }();
 
     const auto moves = generate_moves(b, opponent_of(p));

@@ -41,13 +41,16 @@ bool is_legal_move(const Move& m, const State& s)
     State120 state = s;
     Move120 move = m;
 
-    const auto end =
-        std::remove_if(valid_moves.begin(), valid_moves.end(), [&state](const Move120& m) {
-            auto new_state = state;
-            new_state.apply(m);
-            return in_check(new_state.board, state.active_player);
-        });
-    return std::find(valid_moves.begin(), end, move) != end;
+    if (std::find(valid_moves.begin(), valid_moves.end(), move) == valid_moves.end()) {
+        return false;
+    }
+
+    state.apply(move);
+    if (in_check(state.board, s.active_player)) {
+        return false;
+    }
+
+    return true;
 }
 
 }  // namespace Chess
