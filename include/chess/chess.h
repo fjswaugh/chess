@@ -2,24 +2,13 @@
 
 #include "chess/game.h"
 #include "chess/misc.h"
-#include "chess/square.h"
-#include "chess/state.h"
+#include "chess/generate_moves.h"
+#include "chess/bitboard.h"
+#include "chess/location.h"
+#include "chess/mailbox.h"
+#include "chess/move.h"
+#include "chess/move_list.h"
+#include "chess/position.h"
+#include "chess/typedefs.h"
+#include "chess/evaluate.h"
 
-#include <vector>
-
-namespace Chess {
-
-double evaluate(const State&);
-
-std::vector<Move> generate_moves(const State&);
-
-Move calculate_best_move(const State&);
-
-// Possibly also something like this
-//std::vector<Move> calculate_best_moves(const State&);
-
-bool is_legal_move(const Move&, const State&);
-
-State apply(const Move&, const State&);
-
-}  // namespace Chess

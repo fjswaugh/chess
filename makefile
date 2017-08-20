@@ -19,7 +19,6 @@ OBJDIR  := obj/
 TESTDIR := test/
 
 # CXX := em++ or g++ or clang++
-LINKER := $(CXX)
 INCFLAGS := -I include
 CXXFLAGS := -std=c++14 -Wall -Wextra -O3
 
@@ -36,6 +35,10 @@ DEPFILES := $(patsubst $(SRCDIR)%.cpp,$(OBJDIR)%.d,$(SRCFILES))
 $(LIBDIR)$(PRODUCT): $(OBJFILES)
 	mkdir -p $(LIBDIR)
 	ar rcs $@ $^
+
+lookup_tables:
+	$(CXX) $(CXXFLAGS) $(INCFLAGS) meta/gen.cpp -o $(BINDIR)gen -L$(LIBDIR) -lchess
+	$(BINDIR)gen p > src/lookup_tables.h
 
 test: $(BINDIR)$(TEST_EXECUTABLE) run_tests
 
