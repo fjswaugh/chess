@@ -52,6 +52,9 @@ namespace {
 
         expect(' ');
 
+        // For starters, set castling rights to none
+        position.castling[0] = Castle_rights::none;
+        position.castling[1] = Castle_rights::none;
         for (char ch = advance(); ch != ' '; ch = advance()) {
             switch (ch) {
             case 'K':
