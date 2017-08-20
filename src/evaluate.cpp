@@ -34,7 +34,7 @@ int sum_pieces(const Position& position)
     return score;
 }
 
-int minimax_evaluate(int depth, const Position& position)
+double minimax_evaluate(const Position& position, int depth)
 {
     if (depth <= 0) return sum_pieces(position);
 
@@ -42,12 +42,12 @@ int minimax_evaluate(int depth, const Position& position)
 
     const auto moves = generate_moves(position);
 
-    int best_score = (maximise ? std::numeric_limits<int>::min() :
-                                 std::numeric_limits<int>::max());
+    double best_score = (maximise ? std::numeric_limits<double>::min() :
+                                    std::numeric_limits<double>::max());
 
     for (const auto& move : moves) {
         const auto new_position = apply(move, position);
-        const auto score = minimax_evaluate(depth - 1, new_position);
+        const auto score = minimax_evaluate(new_position, depth - 1);
 
         if ((maximise && score > best_score) || (!maximise && score < best_score)) {
             best_score = score;
@@ -65,13 +65,13 @@ Move calculate_best_move(const Position& position)
     const auto moves = generate_moves(position);
     if (moves.empty()) throw std::runtime_error("Cannot find a legit move");
 
-    int best_score = (maximise ? std::numeric_limits<int>::min()
-                               : std::numeric_limits<int>::max());
+    double best_score = (maximise ? std::numeric_limits<double>::min()
+                                  : std::numeric_limits<double>::max());
     auto best_move = moves.front();
 
     for (const auto& move : moves) {
         const auto new_position = apply(move, position);
-        const auto score = minimax_evaluate(depth - 1, new_position);
+        const auto score = minimax_evaluate(new_position, depth - 1);
 
         if ((maximise && score > best_score) || (!maximise && score < best_score)) {
             best_score = score;
