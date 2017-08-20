@@ -3,6 +3,9 @@
 
 namespace Chess {
 
+constexpr int min_int = -10000;
+constexpr int max_int = 10000;
+
 int sum_pieces(const Position& position)
 {
     int score = 0;
@@ -40,8 +43,7 @@ int minimax_evaluate(const Position& position, int depth)
 
     const auto moves = generate_moves(position);
 
-    int best_score = (maximise ? std::numeric_limits<int>::min() :
-                                    std::numeric_limits<int>::max());
+    int best_score = (maximise ? min_int : max_int);
 
     for (const auto& move : moves) {
         const auto new_position = apply(move, position);
@@ -63,8 +65,7 @@ Move calculate_best_move(const Position& position)
     const auto moves = generate_moves(position);
     if (moves.empty()) throw std::runtime_error("Cannot find a legit move");
 
-    int best_score = (maximise ? std::numeric_limits<int>::min()
-                               : std::numeric_limits<int>::max());
+    int best_score = (maximise ? min_int : max_int);
     auto best_move = moves.front();
 
     for (const auto& move : moves) {
