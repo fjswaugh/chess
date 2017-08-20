@@ -25,7 +25,7 @@ Move deduce_move_from_coordinates(Location from, Location to, const Position& po
 
     auto info = Move::Info(0);
 
-    if (to.row() == far_row) {
+    if (to.row() == far_row && to_piece(position.mailbox[from]) == Piece::pawn) {
         info = Move::Info(*info | *Move::Info::normal_promotion);
     }
 
