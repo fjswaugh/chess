@@ -253,3 +253,27 @@ BOOST_AUTO_TEST_CASE(nps)
               << " nps)\n";
 }
 
+/*
+BOOST_AUTO_TEST_CASE(found_online)
+{
+    auto p = Position::from_fen(initial_fen);
+
+    p = apply(Move("b1", "c3"), p);
+
+    auto move = calculate_best_move(p);
+    std::cout << to_coordinate_string(move) << '\n';
+    p = apply(move, p);
+
+    p = apply(Move("c3", "d5"), p);
+
+    move = calculate_best_move(p);
+    std::cout << to_coordinate_string(move) << '\n';
+    p = apply(move, p);
+
+    pretty_print(p);
+
+    std::cout << Chess::minimax_evaluate(p, 2) << '\n';
+    std::cout << std::numeric_limits<int>::min() << '\n';
+}
+*/
+

@@ -13,11 +13,9 @@ int sum_pieces(const Position& position)
             case Piece::rook:
                 piece_value = 5; break;
             case Piece::queen:
-                piece_value = 10; break;
+                piece_value = 9; break;
             case Piece::bishop:
                 piece_value = 3; break;
-            case Piece::king:
-                piece_value = 1000000; break;
             case Piece::knight:
                 piece_value = 3; break;
             case Piece::pawn:
@@ -26,7 +24,7 @@ int sum_pieces(const Position& position)
                 piece_value = 0; break;
         };
 
-        if (is_black(square)) piece_value *= -1;
+        if (is_black(square)) piece_value = -piece_value;
 
         score += piece_value;
     }
@@ -34,7 +32,7 @@ int sum_pieces(const Position& position)
     return score;
 }
 
-double minimax_evaluate(const Position& position, int depth)
+int minimax_evaluate(const Position& position, int depth)
 {
     if (depth <= 0) return sum_pieces(position);
 
@@ -42,8 +40,8 @@ double minimax_evaluate(const Position& position, int depth)
 
     const auto moves = generate_moves(position);
 
-    double best_score = (maximise ? std::numeric_limits<double>::min() :
-                                    std::numeric_limits<double>::max());
+    int best_score = (maximise ? std::numeric_limits<int>::min() :
+                                    std::numeric_limits<int>::max());
 
     for (const auto& move : moves) {
         const auto new_position = apply(move, position);
@@ -65,8 +63,8 @@ Move calculate_best_move(const Position& position)
     const auto moves = generate_moves(position);
     if (moves.empty()) throw std::runtime_error("Cannot find a legit move");
 
-    double best_score = (maximise ? std::numeric_limits<double>::min()
-                                  : std::numeric_limits<double>::max());
+    int best_score = (maximise ? std::numeric_limits<int>::min()
+                               : std::numeric_limits<int>::max());
     auto best_move = moves.front();
 
     for (const auto& move : moves) {
