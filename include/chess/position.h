@@ -17,7 +17,7 @@ struct Position {
     Bitboard bitboard_by_square[12] = {};
     Bitboard bitboard_by_player[2] = {};
 
-    Castle_rights castling[2] = {};
+    Castle_rights castling[2] = {Castle_rights::both, Castle_rights::both};
     //Location king_location_for_player[2] = {"e1", "e8"};
     Location en_passant_target = "a1";  // Use a1 for no en passant square
     Player active_player = Player::white;

@@ -170,7 +170,9 @@ Position Position::from_fen(const std::string& fen_str)
     Position position;
 
     auto it = parse_fen_to_mailbox(fen_str.begin(), fen_str.end(), position.mailbox);
-    parse_rest_of_fen(it, fen_str.end(), position);
+    if (it != fen_str.end()) {
+        parse_rest_of_fen(it, fen_str.end(), position);
+    }
     fill_bitboards_from_mailbox(position);
 
     return position;
