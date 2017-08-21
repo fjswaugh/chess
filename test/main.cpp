@@ -38,6 +38,7 @@ BOOST_AUTO_TEST_CASE(historical_speed)
 
 BOOST_AUTO_TEST_CASE(new_speed)
 {
+    /*
     const auto begin = std::chrono::high_resolution_clock::now();
 
     auto p = Position::from_fen(initial_fen);
@@ -51,6 +52,7 @@ BOOST_AUTO_TEST_CASE(new_speed)
     std::cout << "Time taken for 5 half moves: "
               << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count()
               << " ms\n";
+              */
 }
 
 BOOST_AUTO_TEST_CASE(historical_interesting_position)
@@ -72,7 +74,6 @@ BOOST_AUTO_TEST_CASE(historical_interesting_position)
     */
 }
 
-/*
 BOOST_AUTO_TEST_CASE(bitboard_conversion)
 {
     auto position = Position::from_fen(initial_fen);
@@ -253,33 +254,28 @@ BOOST_AUTO_TEST_CASE(nps)
     std::cout << x << " in " << time << "ms (" << (1.0 * (double)x) / ((double)time / 1000.0)
               << " nps)\n";
 }
-*/
 
 BOOST_AUTO_TEST_CASE(found_online)
 {
     auto p = Position::from_fen(initial_fen);
 
-    p = apply(Move("b1", "c3"), p);
+    p = apply(Move("e2", "e3"), p);
 
-    auto move = calculate_best_move(p);
+    p = apply(Move("a7", "a6"), p);
+
+    p = apply(Move("d1", "h5"), p);
+
+    p = apply(Move("a6", "a5"), p);
+
+    /*
+    p = apply(Move("h5", "f7"), p);
+
+    const auto move = calculate_best_move(p);
+
     std::cout << to_coordinate_string(move) << '\n';
-    p = apply(move, p);
+    */
 
-    p = apply(Move("c3", "d5"), p);
-
-    move = calculate_best_move(p);
-    std::cout << to_coordinate_string(move) << '\n';
-    p = apply(move, p);
-
-    pretty_print(p);
-
-    std::cout << Chess::minimax_evaluate(p, 2) << '\n';
-    std::cout << std::numeric_limits<int>::min() << '\n';
-
-    p = Position::from_fen("rnbqkbnr/p1p3pp/1p2p3/8/2P1p3/8/PP3PPP/RNBQKBNR");
-    move = Chess::deduce_move_from_coordinates("d1", "d8", p);
-    std::cout << to_coordinate_string(move) << '\n';
-    std::cout << (int)*move.info() << '\n';
-    std::cout << Chess::is_legal_move(move, p) << '\n';
+    //pretty_print(p);
+    std::cout << minimax_evaluate(p, 4) << '\n';
 }
 

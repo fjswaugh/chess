@@ -31,6 +31,9 @@ struct Move {
         en_passant_capture = 0b00001001,
     };
 
+    constexpr Move()
+        : data_{0}
+    {}
     constexpr Move(Location from, Location to, Info i = Info::normal)
         : data_((u16(from) << 10) | (u16(to) << 4) | u16(i))
     {}
