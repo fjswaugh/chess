@@ -5,7 +5,7 @@
 namespace Chess {
 
 Move calculate_best_move(const Position&);
-int minimax_evaluate(const Position&, int depth);
+double evaluate(const Position&);
 
 }  // namespace Chess
 

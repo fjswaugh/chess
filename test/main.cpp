@@ -284,6 +284,6 @@ BOOST_AUTO_TEST_CASE(found_online)
     //std::cout << to_coordinate_string(move) << '\n';
 
     //pretty_print(p);
-    std::cout << minimax_evaluate(p, 4) << '\n';
+    std::cout << evaluate(p) << '\n';
 }
 */

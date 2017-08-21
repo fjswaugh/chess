@@ -57,6 +57,11 @@ int minimax_evaluate(const Position& position, int depth)
     return best_score;
 }
 
+double evaluate(const Position& position)
+{
+    return minimax_evaluate(position, 4);
+}
+
 Move calculate_best_move(const Position& position)
 {
     constexpr int depth = 4;
