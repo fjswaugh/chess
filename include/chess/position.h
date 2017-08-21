@@ -7,6 +7,7 @@
 #include "chess/misc.h"
 
 #include <string>
+#include <istream>
 
 namespace Chess {
 
@@ -26,6 +27,7 @@ struct Position {
 };
 
 std::string to_fen(const Position&);
+std::istream& operator>>(std::istream&, Position&);
 
 Position apply(Move, Position);
 

@@ -31,7 +31,8 @@ namespace {
 
     std::string::const_iterator parse_rest_of_fen(std::string::const_iterator begin,
                                                   std::string::const_iterator end,
-                                                  Position& position) {
+                                                  Position& position)
+    {
         auto it = begin;
 
         const auto advance = [&it, end]() -> char {
@@ -166,6 +167,20 @@ namespace {
         fen += std::to_string(position.fullmove_number);
     }
 
+}
+
+std::istream& operator>>(std::istream& is, Position& position)
+{
+    // Stupid solution but should work for now
+    std::string fen_str;
+    std::string tmp;
+    for (int i = 0; i < 6; ++i) {
+        is >> tmp;
+        fen_str += tmp + " ";
+    }
+    fen_str.pop_back();  // Get rid of that last space
+    position = Position::from_fen(fen_str);
+    return is;
 }
 
 Position Position::from_fen(const std::string& fen_str)
