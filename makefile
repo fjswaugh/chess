@@ -46,7 +46,7 @@ run_tests:
 	$(BINDIR)$(TEST_EXECUTABLE)
 
 $(BINDIR)$(TEST_EXECUTABLE): $(TESTFILES) $(LIBDIR)$(PRODUCT)
-	$(CXX) $(CXXFLAGS) $(INCFLAGS) $(TESTFILES) -o $(BINDIR)$(TEST_EXECUTABLE) -L$(LIBDIR) -lchess -lboost_unit_test_framework
+	$(CXX) $(CXXFLAGS) $(INCFLAGS) $(TESTFILES) -o $(BINDIR)$(TEST_EXECUTABLE) -L$(LIBDIR) -lchess -lboost_unit_test_framework -lpthread
 
 # Clean the project by removing all object files and executable
 clean:
