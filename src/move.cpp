@@ -3,7 +3,8 @@
 
 namespace Chess {
 
-Move deduce_move_from_coordinates(Location from, Location to, const Position& position)
+Move deduce_move_from_coordinates(const Position& position, Location from, Location to,
+                                  Piece promotion_type)
 {
     const int far_row = position.active_player == Player::white ? 7 : 0;
 
@@ -26,7 +27,21 @@ Move deduce_move_from_coordinates(Location from, Location to, const Position& po
     auto info = Move::Info(0);
 
     if (to.row() == far_row && to_piece(position.mailbox[from]) == Piece::pawn) {
-        info = Move::Info(*info | *Move::Info::normal_promotion);
+        switch (promotion_type) {
+            case Piece::rook:
+                info = Move::Info::rook_promotion;
+                break;
+            case Piece::knight:
+                info = Move::Info::knight_promotion;
+                break;
+            case Piece::bishop:
+                info = Move::Info::bishop_promotion;
+                break;
+            case Piece::queen:
+            default:
+                info = Move::Info::queen_promotion;
+                break;
+        }
     }
 
     if (is_square_owned_by_player(position.mailbox[to], opponent_of(position.active_player))) {

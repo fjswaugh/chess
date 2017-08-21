@@ -56,8 +56,8 @@ private:
 
 struct Position;
 
-// If it is a promotion, just promote to queen for now
-Move deduce_move_from_coordinates(Location from, Location to, const Position&);
+Move deduce_move_from_coordinates(const Position&, Location from, Location to,
+                                  Piece promotion_type = Piece::queen);
 
 inline constexpr u8 operator*(Move::Info i) {
     return u8(i);

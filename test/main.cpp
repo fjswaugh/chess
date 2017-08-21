@@ -255,6 +255,15 @@ BOOST_AUTO_TEST_CASE(nps)
               << " nps)\n";
 }
 
+BOOST_AUTO_TEST_CASE(deduce_move)
+{
+    auto p = Position::from_fen(initial_fen);
+    auto m = deduce_move_from_coordinates(p, "a2", "a3");
+    BOOST_CHECK(m == Move("a2", "a3", Move::Info::normal));
+    m = deduce_move_from_coordinates(p, "a2", "a4");
+    BOOST_CHECK(m == Move("a2", "a4", Move::Info::double_pawn_push));
+}
+
 /*
 BOOST_AUTO_TEST_CASE(found_online)
 {
