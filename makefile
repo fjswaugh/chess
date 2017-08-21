@@ -21,6 +21,7 @@ TESTDIR := test/
 # CXX := em++ or g++ or clang++
 INCFLAGS := -I include
 CXXFLAGS := -std=c++14 -Wall -Wextra -O3
+#-fno-omit-frame-pointer -DFNOINLINE
 
 # GNU Make wildcard function generates list of .cpp files
 SRCFILES := $(wildcard $(SRCDIR)*.cpp)

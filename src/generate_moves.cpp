@@ -73,6 +73,9 @@ namespace {
     Bitboard lookup_moves(Location);
 
     template <>
+#ifdef FNOINLINE
+    __attribute__ ((noinline))
+#endif
     Bitboard lookup_moves<Piece::rook>(Location l, Bitboard occupancy_board)
     {
         const Bitboard blockers = attack_lookup_table<Piece::rook>[l] & occupancy_board;
@@ -85,12 +88,18 @@ namespace {
     }
 
     template <>
+#ifdef FNOINLINE
+    __attribute__ ((noinline))
+#endif
     Bitboard lookup_moves<Piece::knight>(Location l)
     {
         return move_lookup_table<Piece::knight>[l];
     }
 
     template <>
+#ifdef FNOINLINE
+    __attribute__ ((noinline))
+#endif
     Bitboard lookup_moves<Piece::bishop>(Location l, Bitboard occupancy_board)
     {
         const Bitboard blockers = attack_lookup_table<Piece::bishop>[l] & occupancy_board;
@@ -103,6 +112,9 @@ namespace {
     }
 
     template <>
+#ifdef FNOINLINE
+    __attribute__ ((noinline))
+#endif
     Bitboard lookup_moves<Piece::queen>(Location l, Bitboard occupancy_board)
     {
         return lookup_moves<Piece::rook>(l, occupancy_board) |
@@ -110,6 +122,9 @@ namespace {
     }
 
     template <>
+#ifdef FNOINLINE
+    __attribute__ ((noinline))
+#endif
     Bitboard lookup_moves<Piece::king>(Location l)
     {
         return move_lookup_table<Piece::king>[l];
@@ -127,8 +142,13 @@ struct Extra {
     Bitboard non_king_move_restriction = 0xFFFFFFFFFFFFFFFF;
     Bitboard pawn_move_restriction     = 0xFFFFFFFFFFFFFFFF;
     Bitboard pin_rays[64];
+
+    Bitboard occupancy_board = 0;
 };
 
+#ifdef FNOINLINE
+__attribute__ ((noinline))
+#endif
 bool in_check(const Position& position, Player player)
 {
     const Player opponent = opponent_of(player);
@@ -183,6 +203,49 @@ bool in_check(const Position& position, Player player)
     return attacked & player_king;
 }
 
+#ifdef FNOINLINE
+__attribute__ ((noinline))
+#endif
+Bitboard locations_inbetween(Location l1, Location l2) {
+    Location bigger  = l1 < l2 ? l2 : l1;
+    Location smaller = l1 < l2 ? l1 : l2;
+
+    Bitboard b = 0;
+
+    if (l1.row() == l2.row()) {
+        bigger = bigger - 1;
+        while (bigger > smaller) {
+            b |= mask_of(bigger);
+            bigger = bigger - 1;
+        }
+    } else if (l1.col() == l2.col()) {
+        bigger = bigger - 8;
+        while (bigger > smaller) {
+            b |= mask_of(bigger);
+            bigger = bigger - 8;
+        }
+    } else if (fdiag[l1] == fdiag[l2]) {
+        bigger = bigger - 9;
+        while (bigger > smaller) {
+            b |= mask_of(bigger);
+            bigger = bigger - 9;
+        }
+    } else if (rdiag[l1] == rdiag[l2]) {
+        bigger = bigger - 7;
+        while (bigger > smaller) {
+            b |= mask_of(bigger);
+            bigger = bigger - 7;
+        }
+    } else {
+        return 0;
+    }
+
+    return b;
+};
+
+#ifdef FNOINLINE
+__attribute__ ((noinline))
+#endif
 Extra generate_extra_information(const Position& position)
 {
     const Player player   = position.active_player;
@@ -260,43 +323,6 @@ Extra generate_extra_information(const Position& position)
 
         e.attacked_by_opponent |= (left_targets | right_targets);
     }
-
-    const auto locations_inbetween = [](Location l1, Location l2) -> Bitboard {
-        Location bigger  = l1 < l2 ? l2 : l1;
-        Location smaller = l1 < l2 ? l1 : l2;
-
-        Bitboard b = 0;
-
-        if (l1.row() == l2.row()) {
-            bigger = bigger - 1;
-            while (bigger > smaller) {
-                b |= mask_of(bigger);
-                bigger = bigger - 1;
-            }
-        } else if (l1.col() == l2.col()) {
-            bigger = bigger - 8;
-            while (bigger > smaller) {
-                b |= mask_of(bigger);
-                bigger = bigger - 8;
-            }
-        } else if (fdiag[l1] == fdiag[l2]) {
-            bigger = bigger - 9;
-            while (bigger > smaller) {
-                b |= mask_of(bigger);
-                bigger = bigger - 9;
-            }
-        } else if (rdiag[l1] == rdiag[l2]) {
-            bigger = bigger - 7;
-            while (bigger > smaller) {
-                b |= mask_of(bigger);
-                bigger = bigger - 7;
-            }
-        } else {
-            return 0;
-        }
-
-        return b;
-    };
 
     {
         // If in single check, make some restrictions
@@ -501,6 +527,9 @@ void add_legal_pawn_promotions(unsigned vector, Bitboard targets, const Extra& e
 // Move generation functions
 namespace {
 
+#ifdef FNOINLINE
+__attribute__ ((noinline))
+#endif
 void generate_king_moves(const Position& position, const Extra& extra, Move_list& moves)
 {
     const auto player = position.active_player;
@@ -517,6 +546,9 @@ void generate_king_moves(const Position& position, const Extra& extra, Move_list
     add_legal_castles(position, extra, moves);
 }
 
+#ifdef FNOINLINE
+__attribute__ ((noinline))
+#endif
 void generate_knight_moves(const Position& position, const Extra& extra, Move_list& moves)
 {
     const auto player = position.active_player;
@@ -535,6 +567,9 @@ void generate_knight_moves(const Position& position, const Extra& extra, Move_li
 template <Piece piece,
           typename = std::enable_if_t<piece == Piece::rook || piece == Piece::bishop ||
                                       piece == Piece::queen>>
+#ifdef FNOINLINE
+__attribute__ ((noinline))
+#endif
 void generate_sliding_moves(const Position& position, const Extra& extra, Move_list& moves)
 {
     const auto player = position.active_player;
@@ -553,6 +588,9 @@ void generate_sliding_moves(const Position& position, const Extra& extra, Move_l
     }
 }
 
+#ifdef FNOINLINE
+__attribute__ ((noinline))
+#endif
 void generate_pawn_captures(const Position& position, const Extra& extra, Move_list& moves)
 {
     const auto player = position.active_player;
@@ -580,9 +618,9 @@ void generate_pawn_captures(const Position& position, const Extra& extra, Move_l
     add_legal_pawn_moves(right_move_vector, right_targets & ~promotion_row, extra,
                          Move::Info::normal_capture, moves);
     add_legal_pawn_promotions(left_move_vector, left_targets & promotion_row, extra,
-                         Move::Info::promotion_capture, moves);
+                              Move::Info::promotion_capture, moves);
     add_legal_pawn_promotions(right_move_vector, right_targets & promotion_row, extra,
-                         Move::Info::promotion_capture, moves);
+                              Move::Info::promotion_capture, moves);
 
     // Test for en passant
     if (position.en_passant_target != "a1") {
@@ -617,6 +655,9 @@ void generate_pawn_captures(const Position& position, const Extra& extra, Move_l
     }
 }
 
+#ifdef FNOINLINE
+__attribute__ ((noinline))
+#endif
 void generate_pawn_pushes(const Position& position, const Extra& extra, Move_list& moves)
 {
     const auto player = position.active_player;

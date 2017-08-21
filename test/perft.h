@@ -34,7 +34,7 @@ inline long long count_moves(const Chess::Position& position, int ply)
 
     if (ply == 1) return moves.size();
 
-    constexpr int num_threads = 4;
+    constexpr int num_threads = 1;
 
     const auto f = [&position, ply](auto begin, auto end, long long& counter) {
         for (auto it = begin; it != end; ++it) {

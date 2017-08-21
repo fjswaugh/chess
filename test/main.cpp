@@ -38,6 +38,7 @@ BOOST_AUTO_TEST_CASE(historical_speed)
 
 BOOST_AUTO_TEST_CASE(new_speed)
 {
+    /*
     const auto begin = std::chrono::high_resolution_clock::now();
 
     auto p = Position::from_fen(initial_fen);
@@ -51,6 +52,7 @@ BOOST_AUTO_TEST_CASE(new_speed)
     std::cout << "Time taken for 5 half moves: "
               << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count()
               << " ms\n";
+              */
 }
 
 BOOST_AUTO_TEST_CASE(historical_interesting_position)
@@ -253,6 +255,7 @@ BOOST_AUTO_TEST_CASE(nps)
               << " nps)\n";
 }
 
+/*
 BOOST_AUTO_TEST_CASE(found_online)
 {
     auto p = Position::from_fen(initial_fen);
@@ -265,15 +268,13 @@ BOOST_AUTO_TEST_CASE(found_online)
 
     p = apply(Move("a6", "a5"), p);
 
-    /*
-    p = apply(Move("h5", "f7"), p);
+    //p = apply(Move("h5", "f7"), p);
 
-    const auto move = calculate_best_move(p);
+    //const auto move = calculate_best_move(p);
 
-    std::cout << to_coordinate_string(move) << '\n';
-    */
+    //std::cout << to_coordinate_string(move) << '\n';
 
     //pretty_print(p);
     std::cout << minimax_evaluate(p, 4) << '\n';
 }
-
+*/
