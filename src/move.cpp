@@ -8,7 +8,7 @@ Move deduce_move_from_coordinates(const Position& position, Location from, Locat
 {
     const int far_row = position.active_player == Player::white ? 7 : 0;
 
-    if (to == position.en_passant_target) {
+    if (to == position.en_passant_target && position.en_passant_target != "a1") {
         return Move(from, to, Move::Info::en_passant_capture);
     }
 

@@ -14,66 +14,7 @@ using namespace Chess;
 
 const auto initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
-BOOST_AUTO_TEST_CASE(historical_speed)
-{
-    /*
-     * Don't really need this, but for comparison, it would normally run in ~320-330ms
-     *
-    const auto begin = std::chrono::high_resolution_clock::now();
-
-    const auto initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
-    auto state = Chess::State::from_fen(initial_fen);
-    for (int i = 0; i < 5; ++i) {
-        auto move = Chess::calculate_best_move(state);
-        state = apply(move, state);
-    }
-
-    const auto end = std::chrono::high_resolution_clock::now();
-
-    std::cout << "Time taken for 5 half moves: "
-              << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count()
-              << " ms\n";
-    */
-}
-
-BOOST_AUTO_TEST_CASE(new_speed)
-{
-    /*
-    const auto begin = std::chrono::high_resolution_clock::now();
-
-    auto p = Position::from_fen(initial_fen);
-    for (int i = 0; i < 5; ++i) {
-        const auto move = calculate_best_move(p);
-        p = apply(move, p);
-    }
-
-    const auto end = std::chrono::high_resolution_clock::now();
-
-    std::cout << "Time taken for 5 half moves: "
-              << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count()
-              << " ms\n";
-              */
-}
-
-BOOST_AUTO_TEST_CASE(historical_interesting_position)
-{
-    /*
-    const auto initial_fen = "1r1k2r1/4R2p/5np1/6N1/5N1P/6P1/5PK1/4R3";
-    auto state = Chess::State::from_fen(initial_fen);
-    //pretty_print(state);
-    //std::cout << "Evaluation: " << Chess::evaluate(state) << '\n';
-    //std::cout << "It doesn't see the checkmate caused by this move: ";
-    const auto move = Chess::Move::from_string("g5-f7");
-    //std::cout << to_string(move) << "\n\n";
-
-    state = Chess::apply(move, state);
-    //pretty_print(state);
-    //std::cout << "Evaluation: " << Chess::evaluate(state) << '\n';
-    //std::cout << "Now the black king will be taken within four half moves, so it can see its "
-    //             "inevitability\n\n";
-    */
-}
-
+/*
 BOOST_AUTO_TEST_CASE(bitboard_conversion)
 {
     auto position = Position::from_fen(initial_fen);
@@ -264,26 +205,23 @@ BOOST_AUTO_TEST_CASE(deduce_move)
     BOOST_CHECK(m == Move("a2", "a4", Move::Info::double_pawn_push));
 }
 
-/*
-BOOST_AUTO_TEST_CASE(found_online)
-{
-    auto p = Position::from_fen(initial_fen);
-
-    p = apply(Move("e2", "e3"), p);
-
-    p = apply(Move("a7", "a6"), p);
-
-    p = apply(Move("d1", "h5"), p);
-
-    p = apply(Move("a6", "a5"), p);
-
-    //p = apply(Move("h5", "f7"), p);
-
-    //const auto move = calculate_best_move(p);
-
-    //std::cout << to_coordinate_string(move) << '\n';
-
-    //pretty_print(p);
-    std::cout << evaluate(p) << '\n';
-}
 */
+
+Move to_move(std::string move_str, const Position& position) {
+    const auto from = Chess::Location(&move_str[0]);
+    const auto to = Chess::Location(&move_str[2]);
+    const auto piece = move_str.length() == 5 ? Chess::to_piece(Chess::to_square(move_str[4]))
+                                              : Chess::Piece::empty;
+    return Chess::deduce_move_from_coordinates(position, from, to, piece);
+}
+
+BOOST_AUTO_TEST_CASE(bug)
+{
+    auto p = Position::from_fen("Rn6/8/1r6/1PN4p/3P2k1/1R4P1/8/1K6 w - - 0 46");
+    auto m = to_move("b1a1", p);
+    BOOST_CHECK(m.from() == "b1");
+    BOOST_CHECK(m.to() == "a1");
+    BOOST_CHECK(m.info() == Move::Info::normal);
+    p = apply(to_move("b1a1", p), p);
+}
+
