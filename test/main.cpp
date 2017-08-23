@@ -14,7 +14,6 @@ using namespace Chess;
 
 const auto initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
-/*
 BOOST_AUTO_TEST_CASE(bitboard_conversion)
 {
     auto position = Position::from_fen(initial_fen);
@@ -204,8 +203,6 @@ BOOST_AUTO_TEST_CASE(deduce_move)
     m = deduce_move_from_coordinates(p, "a2", "a4");
     BOOST_CHECK(m == Move("a2", "a4", Move::Info::double_pawn_push));
 }
-
-*/
 
 Move to_move(std::string move_str, const Position& position) {
     const auto from = Chess::Location(&move_str[0]);

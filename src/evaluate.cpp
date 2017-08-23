@@ -1,4 +1,5 @@
 #include "chess/evaluate.h"
+#include <algorithm>
 #include <utility>
 #include "chess/generate_moves.h"
 
@@ -153,14 +154,17 @@ int invert_if_black(Player p) {
     return int(p) * (-2) + 1;
 }
 
-int negamax_evaluate(const Position& position, int depth, int alpha = -10000, int beta = 10000)
+int negamax_evaluate(Io& io, const Position& position, int depth, int alpha = -10000,
+                     int beta = 10000)
 {
     if (depth <= 0) return static_evaluate(position) * invert_if_black(position.active_player);
 
     const auto moves = generate_moves(position);
 
     for (const auto& move : moves) {
-        const auto score = -negamax_evaluate(apply(move, position), depth - 1, -beta, -alpha);
+        if (io.stopped()) return alpha;
+
+        const auto score = -negamax_evaluate(io, apply(move, position), depth - 1, -beta, -alpha);
         if (score >= beta) return beta;
         if (score > alpha) alpha = score;
     }
@@ -170,30 +174,45 @@ int negamax_evaluate(const Position& position, int depth, int alpha = -10000, in
 
 int evaluate(const Position& position)
 {
-    return negamax_evaluate(position, 6);
+    Io io;
+    return negamax_evaluate(io, position, 6) * invert_if_black(position.active_player);
 }
 
-std::pair<Move, int> recommend_move(const Position& position)
+std::pair<Move, int> recommend_move(Io& io, const Position& position)
 {
-    constexpr int depth = 6;
+    constexpr int max_depth = 5;
 
-    const auto moves = generate_moves(position);
+    auto moves = generate_moves(position);
     if (moves.empty()) throw std::runtime_error("Cannot find a legit move");
 
-    int alpha = -10000;
-    int beta  =  10000;
-    Move best_move = moves.front();
+    int best_score = -10000;
+    Move* best_move = &moves.front();
 
-    for (const auto& move : moves) {
-        const auto score = -negamax_evaluate(apply(move, position), depth - 1, -beta, -alpha);
+    for (int depth = 1; depth <= max_depth; ++depth) {
+        int alpha = -10000;
+        int beta  =  10000;
 
-        if (score > alpha) {
-            alpha = score;
-            best_move = move;
+        for (auto& move : moves) {
+            if (io.stopped()) {
+                io.go();
+                return {*best_move, alpha};
+            }
+
+            const auto score =
+                -negamax_evaluate(io, apply(move, position), depth - 1, -beta, -alpha);
+
+            if (score > alpha) {
+                alpha = score;
+                best_move = &move;
+            }
         }
+
+        std::cout << depth << std::endl;
+        best_score = alpha;
+        std::swap(moves.front(), *best_move);
     }
 
-    return {best_move, alpha};
+    return {*best_move, best_score};
 }
 
 }  // namespace Chess
