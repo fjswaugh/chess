@@ -2,10 +2,12 @@
 
 #include "chess/position.h"
 
+#include <utility>
+
 namespace Chess {
 
-Move calculate_best_move(const Position&);
-double evaluate(const Position&);
+std::pair<Move, int> recommend_move(const Position&);
+int evaluate(const Position&);
 
 }  // namespace Chess
 

@@ -1,89 +1,199 @@
 #include "chess/evaluate.h"
+#include <utility>
 #include "chess/generate_moves.h"
 
 namespace Chess {
 
-constexpr double min_int = -10000;
-constexpr double max_int = 10000;
+constexpr int piece_evaluation_tables[13][64] = {
+    {  // White rooks
+          0,   0,   0,   5,   5,   0,   0,   0,
+         -5,   0,   0,   0,   0,   0,   0,  -5,
+         -5,   0,   0,   0,   0,   0,   0,  -5,
+         -5,   0,   0,   0,   0,   0,   0,  -5,
+         -5,   0,   0,   0,   0,   0,   0,  -5,
+         -5,   0,   0,   0,   0,   0,   0,  -5,
+          5,  10,  10,  10,  10,  10,  10,   5,
+          0,   0,   0,   0,   0,   0,   0,   0,
+    }, {  // Black rooks
+          0,   0,   0,   0,   0,   0,   0,   0,
+          5,  10,  10,  10,  10,  10,  10,   5,
+         -5,   0,   0,   0,   0,   0,   0,  -5,
+         -5,   0,   0,   0,   0,   0,   0,  -5,
+         -5,   0,   0,   0,   0,   0,   0,  -5,
+         -5,   0,   0,   0,   0,   0,   0,  -5,
+         -5,   0,   0,   0,   0,   0,   0,  -5,
+          0,   0,   0,   5,   5,   0,   0,   0,
+    }, {  // White knights
+        -50, -40, -30, -30, -30, -30, -40, -50,
+        -40, -20,   0,   5,   5,   0, -20, -40,
+        -30,   5,  10,  15,  15,  10,   5, -30,
+        -30,   0,  15,  20,  20,  15,   0, -30,
+        -30,   5,  15,  20,  20,  15,   5, -30,
+        -30,   0,  10,  15,  15,  10,   0, -30,
+        -40, -20,   0,   0,   0,   0, -20, -40,
+        -50, -40, -30, -30, -30, -30, -40, -50,
+    }, {  // Black knights
+        -50, -40, -30, -30, -30, -30, -40, -50,
+        -40, -20,   0,   0,   0,   0, -20, -40,
+        -30,   0,  10,  15,  15,  10,   0, -30,
+        -30,   5,  15,  20,  20,  15,   5, -30,
+        -30,   0,  15,  20,  20,  15,   0, -30,
+        -30,   5,  10,  15,  15,  10,   5, -30,
+        -40, -20,   0,   5,   5,   0, -20, -40,
+        -50, -40, -30, -30, -30, -30, -40, -50,
+    }, {  // White bishops
+        -20, -10, -10, -10, -10, -10, -10, -20,
+        -10,   5,   0,   0,   0,   0,   5, -10,
+        -10,  10,  10,  10,  10,  10,  10, -10,
+        -10,   0,  10,  10,  10,  10,   0, -10,
+        -10,   5,   5,  10,  10,   5,   5, -10,
+        -10,   0,   5,  10,  10,   5,   0, -10,
+        -10,   0,   0,   0,   0,   0,   0, -10,
+        -20, -10, -10, -10, -10, -10, -10, -20,
+    }, {  // Black bishops
+        -20, -10, -10, -10, -10, -10, -10, -20,
+        -10,   0,   0,   0,   0,   0,   0, -10,
+        -10,   0,   5,  10,  10,   5,   0, -10,
+        -10,   5,   5,  10,  10,   5,   5, -10,
+        -10,   0,  10,  10,  10,  10,   0, -10,
+        -10,  10,  10,  10,  10,  10,  10, -10,
+        -10,   5,   0,   0,   0,   0,   5, -10,
+        -20, -10, -10, -10, -10, -10, -10, -20,
+    }, {  // White queens
+        -20, -10, -10,  -5,  -5, -10, -10, -20,
+        -10,   0,   5,   0,   0,   0,   0, -10,
+        -10,   5,   5,   5,   5,   5,   0, -10,
+          0,   0,   5,   5,   5,   5,   0,  -5,
+         -5,   0,   5,   5,   5,   5,   0,  -5,
+        -10,   0,   5,   5,   5,   5,   0, -10,
+        -10,   0,   0,   0,   0,   0,   0, -10,
+        -20, -10, -10,  -5,  -5, -10, -10, -20,
+    }, {  // Black queens
+        -20, -10, -10,  -5,  -5, -10, -10, -20,
+        -10,   0,   0,   0,   0,   0,   0, -10,
+        -10,   0,   5,   5,   5,   5,   0, -10,
+         -5,   0,   5,   5,   5,   5,   0,  -5,
+          0,   0,   5,   5,   5,   5,   0,  -5,
+        -10,   5,   5,   5,   5,   5,   0, -10,
+        -10,   0,   5,   0,   0,   0,   0, -10,
+        -20, -10, -10,  -5,  -5, -10, -10, -20,
+    }, {  // White king
+         20,  30,  10,   0,   0,  10,  30,  20,
+         20,  20,   0,   0,   0,   0,  20,  20,
+        -10, -20, -20, -20, -20, -20, -20, -10,
+        -20, -30, -30, -40, -40, -30, -30, -20,
+        -30, -40, -40, -50, -50, -40, -40, -30,
+        -30, -40, -40, -50, -50, -40, -40, -30,
+        -30, -40, -40, -50, -50, -40, -40, -30,
+        -30, -40, -40, -50, -50, -40, -40, -30,
+    }, {  // Black king
+        -30, -40, -40, -50, -50, -40, -40, -30,
+        -30, -40, -40, -50, -50, -40, -40, -30,
+        -30, -40, -40, -50, -50, -40, -40, -30,
+        -30, -40, -40, -50, -50, -40, -40, -30,
+        -20, -30, -30, -40, -40, -30, -30, -20,
+        -10, -20, -20, -20, -20, -20, -20, -10,
+         20,  20,   0,   0,   0,   0,  20,  20,
+         20,  30,  10,   0,   0,  10,  30,  20,
+    }, {  // White pawns
+          0,   0,   0,   0,   0,   0,   0,   0,
+          5,  10,  10, -20, -20,  10,  10,   5,
+          5,  -5, -10,   0,   0, -10,  -5,   5,
+          0,   0,   0,  20,  20,   0,   0,   0,
+          5,   5,  10,  25,  25,  10,   5,   5,
+         10,  10,  20,  30,  30,  20,  10,  10,
+         50,  50,  50,  50,  50,  50,  50,  50,
+          0,   0,   0,   0,   0,   0,   0,   0,
+    }, {  // Black pawns
+          0,   0,   0,   0,   0,   0,   0,   0,
+         50,  50,  50,  50,  50,  50,  50,  50,
+         10,  10,  20,  30,  30,  20,  10,  10,
+          5,   5,  10,  25,  25,  10,   5,   5,
+          0,   0,   0,  20,  20,   0,   0,   0,
+          5,  -5, -10,   0,   0, -10,  -5,   5,
+          5,  10,  10, -20, -20,  10,  10,   5,
+          0,   0,   0,   0,   0,   0,   0,   0,
+    }, {  // Empty
+          0,   0,   0,   0,   0,   0,   0,   0,
+          0,   0,   0,   0,   0,   0,   0,   0,
+          0,   0,   0,   0,   0,   0,   0,   0,
+          0,   0,   0,   0,   0,   0,   0,   0,
+          0,   0,   0,   0,   0,   0,   0,   0,
+          0,   0,   0,   0,   0,   0,   0,   0,
+          0,   0,   0,   0,   0,   0,   0,   0,
+          0,   0,   0,   0,   0,   0,   0,   0,
+    }
+};
 
-double sum_pieces(const Position& position)
+constexpr int nominal_value[13] = {
+    500, 500,  // Rook
+    300, 300,  // Knight
+    300, 300,  // Bishop
+    900, 900,  // Queen
+      0,   0,  // King
+    100, 100,  // Pawn
+      0,       // Empty
+};
+
+int static_evaluate(const Position& position)
 {
-    double score = 0;
-    for (const auto square : position.mailbox) {
-        double piece_value;
+    int score = 0;
 
-        switch (to_piece(square)) {
-            case Piece::rook:
-                piece_value = 5; break;
-            case Piece::queen:
-                piece_value = 9; break;
-            case Piece::bishop:
-                piece_value = 3; break;
-            case Piece::knight:
-                piece_value = 3; break;
-            case Piece::pawn:
-                piece_value = 1; break;
-            default:
-                piece_value = 0; break;
-        };
-
+    for (int location = 0; location < 64; ++location) {
+        const auto square = position.mailbox[location];
+        int piece_value = nominal_value[*square] + piece_evaluation_tables[*square][location];
         if (is_black(square)) piece_value = -piece_value;
-
         score += piece_value;
     }
 
     return score;
 }
 
-double minimax_evaluate(const Position& position, int depth)
-{
-    if (depth <= 0) return sum_pieces(position);
+int invert_if_black(Player p) {
+    return int(p) * (-2) + 1;
+}
 
-    const bool maximise = position.active_player == Player::white;
+int negamax_evaluate(const Position& position, int depth, int alpha = -10000, int beta = 10000)
+{
+    if (depth <= 0) return static_evaluate(position) * invert_if_black(position.active_player);
 
     const auto moves = generate_moves(position);
 
-    double best_score = (maximise ? min_int : max_int);
-
     for (const auto& move : moves) {
-        const auto new_position = apply(move, position);
-        const auto score = minimax_evaluate(new_position, depth - 1);
-
-        if ((maximise && score > best_score) || (!maximise && score < best_score)) {
-            best_score = score;
-        }
+        const auto score = -negamax_evaluate(apply(move, position), depth - 1, -beta, -alpha);
+        if (score >= beta) return beta;
+        if (score > alpha) alpha = score;
     }
 
-    return best_score;
+    return alpha;
 }
 
-double evaluate(const Position& position)
+int evaluate(const Position& position)
 {
-    return minimax_evaluate(position, 4);
+    return negamax_evaluate(position, 6);
 }
 
-Move calculate_best_move(const Position& position)
+std::pair<Move, int> recommend_move(const Position& position)
 {
-    constexpr int depth = 5;
-    const bool maximise = position.active_player == Player::white;
+    constexpr int depth = 6;
 
     const auto moves = generate_moves(position);
     if (moves.empty()) throw std::runtime_error("Cannot find a legit move");
 
-    double best_score = (maximise ? min_int : max_int);
-    auto best_move = moves.front();
+    int alpha = -10000;
+    int beta  =  10000;
+    Move best_move = moves.front();
 
     for (const auto& move : moves) {
-        const auto new_position = apply(move, position);
-        const auto score = minimax_evaluate(new_position, depth - 1);
+        const auto score = -negamax_evaluate(apply(move, position), depth - 1, -beta, -alpha);
 
-        if ((maximise && score > best_score) || (!maximise && score < best_score)) {
-            best_score = score;
-            best_move  = move;
+        if (score > alpha) {
+            alpha = score;
+            best_move = move;
         }
     }
 
-    return best_move;
+    return {best_move, alpha};
 }
 
 }  // namespace Chess
