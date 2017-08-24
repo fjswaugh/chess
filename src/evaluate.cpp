@@ -154,7 +154,7 @@ int invert_if_black(Player p) {
     return int(p) * (-2) + 1;
 }
 
-int negamax_evaluate(Io& io, const Position& position, int depth, int alpha = -10000,
+int negamax(Io& io, const Position& position, int depth, int alpha = -10000,
                      int beta = 10000)
 {
     if (depth <= 0) return static_evaluate(position) * invert_if_black(position.active_player);
@@ -164,7 +164,7 @@ int negamax_evaluate(Io& io, const Position& position, int depth, int alpha = -1
     for (const auto& move : moves) {
         if (io.stopped()) return alpha;
 
-        const auto score = -negamax_evaluate(io, apply(move, position), depth - 1, -beta, -alpha);
+        const auto score = -negamax(io, apply(move, position), depth - 1, -beta, -alpha);
         if (score >= beta) return beta;
         if (score > alpha) alpha = score;
     }
@@ -175,7 +175,7 @@ int negamax_evaluate(Io& io, const Position& position, int depth, int alpha = -1
 int evaluate(const Position& position)
 {
     Io io;
-    return negamax_evaluate(io, position, 6) * invert_if_black(position.active_player);
+    return negamax(io, position, 6) * invert_if_black(position.active_player);
 }
 
 std::pair<Move, int> recommend_move(Io& io, const Position& position)
@@ -198,8 +198,7 @@ std::pair<Move, int> recommend_move(Io& io, const Position& position)
                 return {*best_move, alpha};
             }
 
-            const auto score =
-                -negamax_evaluate(io, apply(move, position), depth - 1, -beta, -alpha);
+            const auto score = -negamax(io, apply(move, position), depth - 1, -beta, -alpha);
 
             if (score > alpha) {
                 alpha = score;

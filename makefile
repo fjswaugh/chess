@@ -20,7 +20,7 @@ TESTDIR := test/
 
 # CXX := em++ or g++ or clang++
 INCFLAGS := -I include
-CXXFLAGS := -std=c++14 -Wall -Wextra -O3 -march=native
+CXXFLAGS := -std=c++17 -Wall -Wextra -O3 -march=native
 #-fno-omit-frame-pointer -DFNOINLINE
 
 # GNU Make wildcard function generates list of .cpp files
