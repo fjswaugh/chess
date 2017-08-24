@@ -180,7 +180,7 @@ int evaluate(const Position& position)
 
 std::pair<Move, int> recommend_move(Io& io, const Position& position)
 {
-    constexpr int max_depth = 5;
+    constexpr int max_depth = 6;
 
     auto moves = generate_moves(position);
     if (moves.empty()) throw std::runtime_error("Cannot find a legit move");
@@ -207,7 +207,6 @@ std::pair<Move, int> recommend_move(Io& io, const Position& position)
             }
         }
 
-        std::cout << depth << std::endl;
         best_score = alpha;
         std::swap(moves.front(), *best_move);
     }

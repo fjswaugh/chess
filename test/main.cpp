@@ -222,3 +222,11 @@ BOOST_AUTO_TEST_CASE(bug)
     p = apply(to_move("b1a1", p), p);
 }
 
+BOOST_AUTO_TEST_CASE(strange_move)
+{
+    auto p = Position::from_fen("1rb1r3/ppk2pPp/3p4/2b5/5B2/2N5/5PPP/n2K1B1R w - - 2 20");
+    Io io;
+    auto [move, x] = recommend_move(io, p);
+    std::cout << Chess::to_coordinate_string(move) << '\n';
+}
+
