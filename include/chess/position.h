@@ -26,6 +26,8 @@ struct Position {
     int fullmove_number = 1;
 };
 
+u64 zobrist_hash(const Position&);
+
 std::string to_fen(const Position&);
 std::istream& operator>>(std::istream&, Position&);
 

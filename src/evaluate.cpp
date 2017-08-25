@@ -154,8 +154,7 @@ int invert_if_black(Player p) {
     return int(p) * (-2) + 1;
 }
 
-int negamax(Io& io, const Position& position, int depth, int alpha = -10000,
-                     int beta = 10000)
+int negamax(Io& io, const Position& position, int depth, int alpha = -10000, int beta = 10000)
 {
     if (depth <= 0) return static_evaluate(position) * invert_if_black(position.active_player);
 

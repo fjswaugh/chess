@@ -1,6 +1,9 @@
 #include "chess/position.h"
 #include "chess/misc.h"
 
+#include <random>
+#include <array>
+
 namespace Chess {
 
 namespace {
@@ -307,6 +310,48 @@ Position apply(Move move, Position position)
     position.active_player = opponent;
 
     return position;
+}
+
+u64 random_u64()
+{
+    static std::mt19937_64 gen{0};
+    return gen();
+}
+
+u64 zobrist_hash(const Position& position)
+{
+    static const auto random_board = [] {
+        std::array<std::array<u64, 13>, 64> array;
+        for (auto& i : array) for (auto& j : i) j = random_u64();
+        return array;
+    }();
+    static const auto random_castling_rights = [] {
+        std::array<u64, 4> array;
+        for (auto& i : array) i = random_u64();
+        return array;
+    }();
+    static const auto random_en_passant_col = [] {
+        std::array<u64, 8> array;
+        for (auto& i : array) i = random_u64();
+        return array;
+    }();
+    static const u64 random_black_to_move = random_u64();
+
+    u64 value = 0;
+
+    for (int i = 0; i < 64; ++i) {
+        value ^= random_board[i][*position.mailbox[i]];
+    }
+    value ^= (can_castle_kingside (position.castling[0]) * random_castling_rights[0]);
+    value ^= (can_castle_queenside(position.castling[0]) * random_castling_rights[1]);
+    value ^= (can_castle_kingside (position.castling[1]) * random_castling_rights[3]);
+    value ^= (can_castle_queenside(position.castling[1]) * random_castling_rights[4]);
+    if (position.en_passant_target != "a1") {
+        value ^= random_en_passant_col[position.en_passant_target.col()];
+    }
+    value ^= (*position.active_player * random_black_to_move);
+
+    return value;
 }
 
 }  // namespace Chess
