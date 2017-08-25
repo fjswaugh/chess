@@ -9,6 +9,13 @@ struct Move_list {
         : size_{0}
     {}
 
+    Move operator[](int i) const {
+        return data_[i];
+    }
+    Move& operator[](int i) {
+        return data_[i];
+    }
+
     Move* begin() {
         return data_;
     }

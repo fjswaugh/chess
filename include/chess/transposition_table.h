@@ -16,9 +16,14 @@ enum class Node_type : u8 {
 struct Transposition_node {
     u64 key = 0;
     Move best_move;
+    u8 best_move_position = 0;
     i16 score = 0;
-    Node_type type = Node_type::pv;
     u8 depth = 0;
+    Node_type type = Node_type::pv;
+
+    constexpr explicit operator bool() const {
+        return key != 0;
+    }
 };
 
 inline constexpr std::size_t index_of(u64 key) {
@@ -26,7 +31,7 @@ inline constexpr std::size_t index_of(u64 key) {
     return key & 0b0000000000000000000000000000000000000011111111111111111111111111;
 }
 
-using Transposition_table = std::array<Transposition_node, (1 << 26)>;
+using Transposition_table = Transposition_node[1<<26];
 
 }
 

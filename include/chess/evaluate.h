@@ -1,6 +1,7 @@
 #pragma once
 
 #include "chess/position.h"
+#include "chess/transposition_table.h"
 
 #include <utility>
 #include <atomic>
@@ -18,8 +19,8 @@ private:
     std::atomic<int> stop_;
 };
 
-std::pair<Move, int> recommend_move(Io&, const Position&);
-int evaluate(const Position&);
+std::pair<Move, i16> recommend_move(Io&, const Position&, Transposition_table);
+i16 evaluate(const Position&);
 
 }  // namespace Chess
 

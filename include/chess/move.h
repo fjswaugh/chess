@@ -50,6 +50,9 @@ struct Move {
     friend constexpr bool operator==(Move a, Move b) {
         return a.data_ == b.data_;
     }
+    constexpr operator bool() const {
+        return data_ != 0;
+    }
 private:
     u16 data_;
 };
