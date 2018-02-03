@@ -38,7 +38,7 @@ $(LIBDIR)$(PRODUCT): $(OBJFILES)
 	ar rcs $@ $^
 
 lookup_tables:
-	$(CXX) $(CXXFLAGS) $(INCFLAGS) meta/gen.cpp -o $(BINDIR)gen -L$(LIBDIR) -lchess
+	$(CXX) $(CXXFLAGS) $(INCFLAGS) meta/gen.cpp -o $(BINDIR)gen
 	$(BINDIR)gen p > src/lookup_tables.h
 
 test: $(BINDIR)$(TEST_EXECUTABLE) run_tests
@@ -51,6 +51,7 @@ $(BINDIR)$(TEST_EXECUTABLE): $(TESTFILES) $(LIBDIR)$(PRODUCT)
 
 # Clean the project by removing all object files and executable
 clean:
+	rm $(SRCDIR)/lookup_tables.h
 	rm -f $(OBJDIR)* $(LIBDIR)$(PRODUCT) $(BINDIR)*
 
 # Remove dependency files and rebuild all dependencies

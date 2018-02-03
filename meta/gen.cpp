@@ -176,7 +176,7 @@ Bitboard move_bitboard_from_blocker<Piece::rook>(Bitboard blocker, Location l) {
     const Bitboard cblocker = blocker & col_mask;
 
     // Here you must reverse cols and rows separately
-    const auto rc = [l](u64 b) -> u64 { return reverse_cols(b); };
+    const auto rc = [](u64 b) -> u64 { return reverse_cols(b); };
     const auto rr = [l](u64 b) -> u64 { return reverse_row(b, l.row()); };
 
     Bitboard move = 0;
@@ -368,34 +368,22 @@ void print_move_tables()
     std::printf("};\n\n");
 }
 
-int main(int argc, char**)
+int main()
 {
     generate_magic_bitboards_and_move_lookup_tables<Piece::rook>();
     generate_magic_bitboards_and_move_lookup_tables<Piece::bishop>();
 
-    if (argc > 1) {
-        std::printf("#pragma once\n\n");
+    std::printf("#pragma once\n\n");
 
-        std::printf("#include \"chess/misc.h\"\n");
-        std::printf("#include \"chess/bitboard.h\"\n\n");
+    std::printf("#include \"chess/misc.h\"\n");
+    std::printf("#include \"chess/bitboard.h\"\n\n");
 
-        std::printf("namespace Chess {\n\n");
+    std::printf("namespace Chess {\n\n");
 
-        print_attack_tables();
-        print_magic_tables();
-        print_move_tables();
+    print_attack_tables();
+    print_magic_tables();
+    print_move_tables();
 
-        std::printf("}  // namespace Chess\n\n");
-    } else {
-        auto pos = Position::from_fen("rnbqkbnr/pppppppp/8/8/8/8/1PPPPPP1/RNBQKBNR w KQkq - 0 1");
-        const auto occupancy_board = pos.bitboard_by_player[0] | pos.bitboard_by_player[1];
-        const Bitboard blockers = attack_lookup_table<Piece::rook>[0] & occupancy_board;
-        const Bitboard magic = ::magic_bitboard_lookup_table<Piece::rook>[0];
-        const int index = (blockers * magic) >> (64-12);
-        const Bitboard move = ::move_lookup_table<Piece::rook>[0][index];
-
-        print(move);
-        print(move_bitboard_from_blocker<Piece::rook>(blockers, "a1"));
-    }
+    std::printf("}  // namespace Chess\n\n");
 }
 

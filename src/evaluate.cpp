@@ -9,6 +9,8 @@
 
 namespace Chess {
 
+namespace {
+
 constexpr i16 piece_evaluation_tables[13][64] = {
     {  // White rooks
           0,   0,   0,   5,   5,   0,   0,   0,
@@ -140,6 +142,8 @@ constexpr i16 nominal_value[13] = {
       0,       // Empty
 };
 
+constexpr i16 big = 10000;
+
 i16 static_evaluate(const Position& position)
 {
     i16 score = 0;
@@ -154,102 +158,89 @@ i16 static_evaluate(const Position& position)
     return score;
 }
 
-i16 invert_if_black(Player p) {
-    return i16(p) * (-2) + 1;
+i16 invert_if_black(i16 score, Player p) {
+    return score * (i16(p) * (-2) + 1);
 }
 
-template <bool> struct Return;
-template <> struct Return<false> { using type = i16; };
-template <> struct Return<true>  { using type = std::pair<Move, i16>; };
-template <bool root> using Return_t = typename Return<root>::type;
-
-template <bool root>
-Return_t<root> negamax(Io& io, const Position& position, u8 depth, Transposition_table tt,
-                       i16 alpha = -10000, const i16 beta = 10000)
+auto generate_ordered_moves(const Position& position, const u64 key,
+                            const Transposition_node& node)
 {
-    if (depth <= 0) {
-        if constexpr (root) {
-            assert(false);
-        } else {
-            return static_evaluate(position) * invert_if_black(position.active_player);
-        }
-    }
-
-    const auto key = zobrist_hash(position);
-    Transposition_node& node = tt[index_of(key)];
-
-    if (node && node.key == key && node.depth >= depth && node.type == Node_type::pv) {
-        if constexpr (root) return {node.best_move, node.score};
-        else                return node.score;
-    }
-
     auto moves = generate_moves(position);
-
     if (node && node.key == key) {
         std::swap(moves[0], moves[node.best_move_position]);
     }
-    
-    Move best_move;
+    return moves;
+}
 
-    if constexpr (root) {
-        assert(!moves.empty());
-        best_move = moves.front();
+Recommendation search(const Io& io, const Position& position, u8 depth, i16 alpha, i16 beta,
+                      Transposition_table& tt)
+{
+    if (depth == 0) {
+        return {{}, invert_if_black(static_evaluate(position), position.active_player)};
     }
 
+    const auto key = zobrist_hash(position);
+    const auto& node = tt.at(key);
+
+    if (node && node.key == key && node.depth >= depth && node.type == Node_type::pv) {
+        return {node.best_move, node.score};
+    }
+
+    const auto moves = generate_ordered_moves(position, key, node);
+
+    Move best_move = moves.empty() ? Move{} : moves.front();
     u8 best_move_position = 0;
 
+    u8 i = 0;
     for (const auto& move : moves) {
-        ++best_move_position;
-
-        if (io.stopped()) {
-            if constexpr (root) return {best_move, alpha};
-            else                return alpha;
-        }
+        if (io.stopped()) return {best_move, alpha};
 
         const auto new_position = apply(move, position);
-        const auto score = -negamax<false>(io, new_position, depth - 1, tt, -beta, -alpha);
+        const auto score = -search(io, new_position, depth - 1, -beta, -alpha, tt).score;
 
         if (score >= beta) {
             alpha = beta;
+            best_move = move;
+            best_move_position = i;
             break;
         }
         if (score > alpha) {
             alpha = score;
             best_move = move;
+            best_move_position = i;
         }
-    }
-    --best_move_position;
 
-    if (best_move) {
-        const Node_type type = alpha == beta ? Node_type::fail_high : Node_type::pv;
-        node = Transposition_node{key, best_move, best_move_position, alpha, depth, type};
+        ++i;
     }
 
-    if constexpr (root) return {best_move, alpha};
-    else                return alpha;
+    const Node_type type = alpha == beta ? Node_type::fail_high : Node_type::pv;
+    tt.at(key) = Transposition_node{key, best_move, best_move_position, alpha, depth, type};
+
+    return {best_move, alpha};
 }
 
-i16 evaluate(const Position&)
+}  // namespace
+
+void recommend_move(const Io& io, const Position& position, Transposition_table& tt)
 {
-    Io io;
-    return 0;
-}
+    const u8 max_depth = 7;
 
-std::pair<Move, i16> recommend_move(Io& io, const Position& position, Transposition_table tt)
-{
-    constexpr int max_depth = 7;
-
-    auto moves = generate_moves(position);
-    if (moves.empty()) throw std::runtime_error("Cannot find a legit move");
-
-    int best_score = -10000;
-    Move best_move = moves.front();
+    Move best_move;
+    i16 best_score{};
 
     for (u8 depth = 1; depth <= max_depth; ++depth) {
-        std::tie(best_move, best_score) = negamax<true>(io, position, depth, tt);
+        const i16 alpha = -big;
+        const i16 beta  = +big;
+        const auto [move, score] = search(io, position, depth, alpha, beta, tt);
+
+        if (io.stopped()) break;
+
+        best_move = move;
+        best_score = score;
     }
 
-    return {best_move, best_score};
+    io.report_score(best_score);
+    io.report_best_move(best_move);
 }
 
 }  // namespace Chess

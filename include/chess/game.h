@@ -1,27 +1,24 @@
 #pragma once
 
-#include "chess/position.h"
-#include "chess/move.h"
+#include <vector>
 
 namespace Chess {
 
+struct Position;
+
 class Game {
 public:
-    Game(Position initial_position = {})
-        : history_{initial_position}
-    {}
+    Game();
+    Game(const Position& initial_position);
+    Game(Position&& initial_position);
 
     Position& position() { return history_.back(); }
     const Position& position() const { return history_.back(); }
 
-    void add_state(Position p) {
-        history_.push_back(p);
-    }
+    void add_state(const Position&);
+    void add_state(Position&&);
 
-    void undo() {
-        if (history_.size() > 1) history_.pop_back();
-        if (history_.size() > 1) history_.pop_back();
-    }
+    void undo();
 private:
     std::vector<Position> history_;
 };

@@ -1,4 +1,5 @@
 bin/**
 obj/**
 lib/**
+src/lookup_tables.h
 *.swp

@@ -3,7 +3,7 @@
 #include "misc.h"
 #include "move.h"
 
-#include <array>
+#include <vector>
 
 namespace Chess {
 
@@ -26,12 +26,31 @@ struct Transposition_node {
     }
 };
 
-inline constexpr std::size_t index_of(u64 key) {
-    // Take the lower 26 bits
-    return key & 0b0000000000000000000000000000000000000011111111111111111111111111;
-}
+static_assert(sizeof(Transposition_node) == 16);
 
-using Transposition_table = Transposition_node[1<<26];
+struct Transposition_table {
+    Transposition_table(u8 log_size = 26)
+        : nodes_(1 << log_size), mask_{0}
+    {
+        for (u8 i = 0; i < log_size; ++i) {
+            mask_ |= (1 << i);
+        }
+    }
 
+    Transposition_node& at(u64 key) {
+        return nodes_[this->index_of(key)];
+    }
+
+    const Transposition_node& at(u64 key) const {
+        return nodes_[this->index_of(key)];
+    }
+private:
+    constexpr std::size_t index_of(u64 key) const {
+        return key & mask_;
+    }
+
+    std::vector<Transposition_node> nodes_;
+    u64 mask_;
+};
 }
 
