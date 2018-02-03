@@ -38,6 +38,7 @@ $(LIBDIR)$(PRODUCT): $(OBJFILES)
 	ar rcs $@ $^
 
 lookup_tables:
+	mkdir -p $(BINDIR)
 	$(CXX) $(CXXFLAGS) $(INCFLAGS) meta/gen.cpp -o $(BINDIR)gen
 	$(BINDIR)gen p > src/lookup_tables.h
 
