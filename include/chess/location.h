@@ -7,6 +7,10 @@
 
 namespace Chess {
 
+/**
+ * A location on a chess board. The data is stored as a single integer that
+ * ranges from 0 to 63.
+ */
 struct Location {
     constexpr Location(u8 data) : data_{data} {
         assert(data < 64);

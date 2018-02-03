@@ -6,6 +6,9 @@ namespace Chess {
 
 struct Position;
 
+/**
+ * An extremely simple type that models a game of chess.
+ */
 class Game {
 public:
     Game();

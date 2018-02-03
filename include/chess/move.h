@@ -8,6 +8,10 @@
 
 namespace Chess {
 
+/**
+ * Space-efficient representation of a chess move
+ * Note that a move can be 'null'
+ */
 struct Move {
     enum class Info : u8 {
         normal_promotion = 0b00000111,
@@ -54,6 +58,8 @@ struct Move {
         return data_ != 0;
     }
 private:
+    // 6 bits containing where the move is 'from', 6 bits containing where the
+    // move it 'to', and 4 bits containing the move info
     u16 data_;
 };
 

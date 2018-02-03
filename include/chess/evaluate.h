@@ -9,6 +9,9 @@
 
 namespace Chess {
 
+/**
+ * Object for communicating with an evaluation function
+ */
 struct Io {
     Io() = default;
 
@@ -28,22 +31,26 @@ private:
     std::atomic<bool> stop_ = false;
 };
 
+/**
+ * A move recommendation type, containing just the recommended move and a score
+ * associated with the position. The score places a value of 100 on each pawn's
+ * worth of advantage held by a player.
+ */
 struct Recommendation {
     Move move;
     i16 score;
 };
 
 /**
- * Main function for selecting a move
+ * Main function for selecting a move, the output is given to the Io object
+ * passed in. The transposition table passed in will be used and modified.
  */
 void recommend_move(const Io&, const Position&, Transposition_table&);
 
-inline void recommend_move(const Io& io, const Position& p)
-{
-    Transposition_table tt;
-    recommend_move(io, p, tt);
-}
-
+/**
+ * Convenience function for recommending a move without having to pass in an Io
+ * object
+ */
 inline Recommendation recommend_move(const Position& position, Transposition_table& tt)
 {
     Recommendation result;
@@ -57,13 +64,24 @@ inline Recommendation recommend_move(const Position& position, Transposition_tab
     return result;
 }
 
+/**
+ * Convenience function to recommend a move without needing to pass in a
+ * transposition table
+ */
 inline Recommendation recommend_move(const Position& position)
 {
-    Transposition_table tt;
+    // Create a small transposition table
+    Transposition_table tt(8);
     return recommend_move(position, tt);
 }
 
-// Need evaluate functions
+/**
+ * Convenience function to evaluate a position
+ */
+inline i16 evaluate(const Position& position)
+{
+    return recommend_move(position).score;
+}
 
 }  // namespace Chess
 

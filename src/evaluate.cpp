@@ -162,6 +162,11 @@ i16 invert_if_black(i16 score, Player p) {
     return score * (i16(p) * (-2) + 1);
 }
 
+/**
+ * Generates moves and then orders them according to whatever heuristics we
+ * wish to use. Right now, we simply swap the front move with the one we deem
+ * most likely to be best.
+ */
 auto generate_ordered_moves(const Position& position, const u64 key,
                             const Transposition_node& node)
 {
@@ -182,6 +187,7 @@ Recommendation search(const Io& io, const Position& position, u8 depth, i16 alph
     const auto key = zobrist_hash(position);
     const auto& node = tt.at(key);
 
+    // If we've already encountered this exact situation before, we can just return
     if (node && node.key == key && node.depth >= depth && node.type == Node_type::pv) {
         return {node.best_move, node.score};
     }

@@ -4,14 +4,13 @@
 #include "chess/location.h"
 #include "chess/move.h"
 
-#include <vector>
 #include <cstdint>
 #include <cassert>
 #include <bitset>
 
 namespace Chess {
 
-/*
+/**
  *
  * Consider a chess board indexed as followed
  *   +-----------------------+
@@ -33,11 +32,12 @@ namespace Chess {
  *   +-----------------------+
  *     A  B  C  D  E  F  G  H
  *
- * Those indices represent the positions of those squares in a 64-bit bitboard, with the 0 index
- * being the least significant bit, and 63 representing the most significant bit
+ * Those indices represent the positions of those squares in a 64-bit bitboard,
+ * with the 0 index being the least significant bit, and 63 representing the
+ * most significant bit
  *
- * That is, an otherwise empty board with pieces at A3 and B2 would be represented by the following
- * 64-bit unsigned integer:
+ * That is, an otherwise empty board with pieces at A3 and B2 would be
+ * represented by the following 64-bit unsigned integer:
  *
  * 00000000 00000000 00000000 00000000 00000000 00000000 00000010 00000100 
  *

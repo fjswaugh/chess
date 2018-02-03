@@ -1,3 +1,10 @@
+/**
+ * This file generates the 'magic bitboards' needed to generate moves efficiently
+ * See: https://chessprogramming.wikispaces.com/Magic+Bitboards
+ * Here we generate 'plain' magic bitboards, which use quite a lot of space.
+ * Better implementations are available, but are a little more complex.
+ */
+
 #include "chess/chess.h"
 
 #include <cstring>

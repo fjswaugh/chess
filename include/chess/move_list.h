@@ -4,6 +4,12 @@
 
 namespace Chess {
 
+/**
+ * Move list is rather like a std::vector<Move>, but without heap allocation.
+ * The size of the list is limited to 256, and behaviour is currently undefined
+ * should that size be exceeded. Fortunately, there is no chess position that
+ * generates more than 256 possible moves.
+ */
 struct Move_list {
     Move_list()
         : size_{0}
